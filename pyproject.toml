@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "voiceproof"
+version = "0.1.0"
+description = "Self-hosted payment approval on a signed channel: defeats deepfake/CEO fraud by moving approval off voice onto HMAC-signed, expiring, single-use tokens."
+readme = "README.md"
+license = { text = "GPL-3.0-or-later" }
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+voiceproof = "voiceproof.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["voiceproof*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
