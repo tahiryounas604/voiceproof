@@ -8,21 +8,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Extract zip
+      - name: Verify and restore package folder
         run: |
           set -euxo pipefail
           unzip -o voiceproof.zip
-          ls -R voiceproof
-          rsync -a --exclude='.github/workflows/ci.yml' voiceproof/ ./
-          cp voiceproof/.github/workflows/ci.yml ./ci.yml.staged
+          ls -R voiceproof/voiceproof
+          cmp voiceproof/LICENSE LICENSE
+          cmp voiceproof/README.md README.md
+          cmp voiceproof/pyproject.toml pyproject.toml
+          cmp voiceproof/voiceproof.py voiceproof.py
+          cmp voiceproof/tests/conftest.py tests/conftest.py
+          cmp voiceproof/tests/test_server.py tests/test_server.py
+          cmp voiceproof/tests/test_voiceproof.py tests/test_voiceproof.py
+          cmp voiceproof/.github/workflows/ci.yml .github/workflows/ci.yml
+          mkdir -p /tmp/vp_pkg
+          cp -a voiceproof/voiceproof/. /tmp/vp_pkg/
           rm -rf voiceproof voiceproof.zip
+          mkdir -p voiceproof
+          cp -a /tmp/vp_pkg/. voiceproof/
+          ls -R voiceproof
           git status --short
-      - name: Commit extracted files
+      - name: Commit package folder
         run: |
           set -euxo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
           git status --short
-          git commit -m "Extract voiceproof.zip (ci.yml staged for manual move)" || echo "nothing to commit"
+          git commit -m "Restore voiceproof package folder" || echo "nothing to commit"
           git push
